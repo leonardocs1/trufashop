@@ -1,4 +1,4 @@
-require('dotenv').config({ path: '../.env.homologacao' })
+require('dotenv').config({ path: '../.env.producao' })
 
 const https = require('https')
 const axios = require('axios')
@@ -62,7 +62,28 @@ const createCharge = async (accessToken, chargeData) => {
   return result
 }
 
+const getLoc = async (accessToken, locId) => {
+  const certificado = fs.readFileSync('../' + process.env.GN_CERTIFICADO)
+  const agent = new https.Agent({
+    pfx: certificado,
+    passphrase: '',
+  })
+
+  const config = {
+    method: 'GET',
+    url: baseUrl + '/v2/loc/' + locId + '/qrcode',
+    headers: {
+      Authorization: 'Bearer ' + accessToken,
+      'Content-type': 'application/json',
+    },
+    httpsAgent: agent,
+  }
+  const result = await axios(config)
+  return result
+}
+
 const run = async () => {
+  const chave = process.env.CHAVE_PIX
   const token = await getToken()
   const accessToken = token.access_token
 
@@ -75,12 +96,13 @@ const run = async () => {
       nome: 'Leonardo Costa Santos',
     },
     valor: {
-      original: '130.50',
+      original: '1.00',
     },
-    chave: '000',
+    chave,
     solicitacaoPagador: 'Cobranca dos serviços prestados',
   }
-
   const cobranca = await createCharge(accessToken, cob)
+  const qrcode = await getLoc(accessToken, cobranca.data.loc.id)
+  console.log(qrcode)
 }
 run()
