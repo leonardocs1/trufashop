@@ -1,5 +1,4 @@
-require('dotenv').config({ path: '../.env.producao' })
-console.log(process.env.GN_ENV)
+require('dotenv').config({ path: '../.env.homologacao' })
 
 const https = require('https')
 const axios = require('axios')
@@ -37,6 +36,51 @@ const getToken = async () => {
     data: data,
   }
   const result = await axios(config)
-  console.log(result.data)
+  return result.data
 }
-getToken()
+
+const createCharge = async (accessToken, chargeData) => {
+  const certificado = fs.readFileSync('../' + process.env.GN_CERTIFICADO)
+  const data = JSON.stringify(chargeData)
+
+  const agent = new https.Agent({
+    pfx: certificado,
+    passphrase: '',
+  })
+
+  const config = {
+    method: 'POST',
+    url: baseUrl + '/v2/cob',
+    headers: {
+      Authorization: 'Bearer ' + accessToken,
+      'Content-type': 'application/json',
+    },
+    httpsAgent: agent,
+    data: data,
+  }
+  const result = await axios(config)
+  return result
+}
+
+const run = async () => {
+  const token = await getToken()
+  const accessToken = token.access_token
+
+  const cob = {
+    calendario: {
+      expiracao: 3600,
+    },
+    devedor: {
+      cpf: '12345678909',
+      nome: 'Leonardo Costa Santos',
+    },
+    valor: {
+      original: '130.50',
+    },
+    chave: '000',
+    solicitacaoPagador: 'Cobranca dos serviços prestados',
+  }
+
+  const cobranca = await createCharge(accessToken, cob)
+}
+run()
