@@ -2,3 +2,4 @@
 .env.producao
 *.p12
 node_modules
+.next
