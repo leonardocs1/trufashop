@@ -2,7 +2,9 @@ import { useCart } from './CartContex'
 
 const Header = () => {
   const cart = useCart()
-  const itemsCount = Object.keys(cart.cart).length
+  const itemsCount = Object.keys(cart.cart).reduce((prev, curr) => {
+    return prev + cart.cart[curr].quantity
+  }, 0)
   return (
     <header class='bg-white shadow'>
       <nav class='container mx-auto px-6 py-3'>

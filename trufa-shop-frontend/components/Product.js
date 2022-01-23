@@ -4,6 +4,7 @@ import CartIcon from './icons/CartIcon'
 const Product = ({ product }) => {
   const cart = useCart()
   const add = (product) => () => {
+    window.localStorage.setItem('test', 10)
     cart.addToCart(product)
   }
   return (
