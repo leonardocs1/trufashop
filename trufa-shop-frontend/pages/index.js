@@ -2,11 +2,15 @@ import Prismic from 'prismic-javascript'
 import { useCart } from '../components/CartContex'
 import Header from '../components/Header'
 import Product from '../components/Product'
+import Head from 'next/head'
 
 const Index = ({ products }) => {
   const cart = useCart()
   return (
     <>
+      <Head>
+        <title>TrufaShop</title>
+      </Head>
       <Header />
       <div className='mt-6'>
         <main class='grid grid-flow-col grid-cols-3 gap-2'>
