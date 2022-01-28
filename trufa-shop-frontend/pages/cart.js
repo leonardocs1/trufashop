@@ -14,16 +14,20 @@ const Index = ({ products }) => {
       telefone: '',
     },
     onSubmit: async (values) => {
-      try {
-        const response = await axios.post(
-          'http://localhost:3001/create-order',
-          values
-        )
-        console.log(response.data)
-      } catch (error) {
-        // Trate o erro aqui.
-        console.log('Houve um erro.', error.message || error)
-      }
+      const order = { ...values }
+      const items = Object.keys(cart.cart).map((curr) => {
+        const item = {
+          quantity: cart.cart[curr].quantity,
+          price: cart.cart[curr].product.data.price,
+          name: cart.cart[curr].product.data.name,
+        }
+        return item
+      })
+      order.items = items
+      const results = await axios.post(
+        'http://localhost:3001/create-order',
+        order
+      )
     },
   })
   const remove = (id) => () => {
