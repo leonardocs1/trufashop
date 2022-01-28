@@ -13,7 +13,7 @@ const Index = ({ products }) => {
       </Head>
       <Header />
       <div className='mt-6'>
-        <main class='grid grid-flow-col grid-cols-3 gap-2'>
+        <main className='grid grid-flow-col grid-cols-3 gap-2'>
           {products.map((product) => (
             <Product product={product} />
           ))}
