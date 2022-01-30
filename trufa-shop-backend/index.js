@@ -1,28 +1,24 @@
-const express = require('express')
-const cors = require('cors')
-const { saveOrder } = require('./lib/spreadsheet')
-const { createPixCharge } = require('./lib/pix')
+require('dotenv').config({ path: '../.env.producao' })
 
-const app = express()
+const https = require('https')
+const fs = require('fs')
+const app = require('./app')
 
-app.use(cors())
-app.use(express.json())
+const options = {
+  //tls
+  key: fs.readFileSync(
+    '/etc/letsencrypt/live/api-trufashop.leonardo-dev.tech/fullchain.pem'
+  ),
+  cert: fs.readFileSync(
+    '/etc/letsencrypt/live/api-trufashop.leonardo-dev.tech/privkey.pem'
+  ),
 
-app.get('/', (req, res) => {
-  res.send({ ok: true })
-})
-app.post('/create-order', async (req, res) => {
-  const pixCharge = await createPixCharge(req.body)
-  const { qrcode, cobranca } = pixCharge
-  await saveOrder({ ...req.body, id: cobranca.txid })
-  res.send({ ok: 1, qrcode, cobranca })
-})
+  // mtls
+  ca: fs.readFileSync('./ca-gerencianet.crt'), // gerencianet
+  minVersion: 'TLSv1.2',
+  requestCert: true,
+  rejectUnauthorized: false,
+}
 
-app.listen(3001, (err) => {
-  if (err) {
-    console.log('Servidor não iniciado.')
-    console.log(err)
-  } else {
-    console.log('Servidor do TrufaShop rodando na porta: 3001')
-  }
-})
+const server = https.createServer(options, app)
+server.listen(443)
