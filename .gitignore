@@ -3,3 +3,4 @@
 *.p12
 node_modules
 .next
+credenciais.json
