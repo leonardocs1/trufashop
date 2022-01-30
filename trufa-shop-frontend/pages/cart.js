@@ -4,8 +4,11 @@ import { useCart } from '../components/CartContex'
 import Header from '../components/Header'
 import { useFormik } from 'formik'
 import axios from 'axios'
+import { useState } from 'react'
 
 const Index = ({ products }) => {
+  const [orderStatus, setOrderStatus] = useState('pre-order') // ordering, order-received
+  const [qrcode, setQrCode] = useState('')
   const cart = useCart()
   const form = useFormik({
     initialValues: {
@@ -24,10 +27,13 @@ const Index = ({ products }) => {
         return item
       })
       order.items = items
-      const results = await axios.post(
+      setOrderStatus('ordering')
+      const result = await axios.post(
         'http://localhost:3001/create-order',
         order
       )
+      setQrCode(result.data.qrcode.imagemQrcode)
+      setOrderStatus('order-received')
     },
   })
   const remove = (id) => () => {
@@ -135,64 +141,74 @@ const Index = ({ products }) => {
               <div className='lg:px-2 lg:w-1/2'>
                 <div className='p-4 bg-gray-100 rounded-full'>
                   <h1 className='ml-2 font-bold uppercase'>Seus dados</h1>
-                  <pre>{JSON.stringify(form.values, 2, null)}</pre>
                 </div>
                 <div className='p-4'>
-                  <p className='mb-4 italic'>
-                    Por favor, informe seus dados abaixo para concluir.
-                  </p>
                   <div className='justify-center'>
-                    <form onSubmit={form.handleSubmit}>
-                      <div className='my-1 flex items-center w-full h-13 pl-3 bg-white bg-gray-100 border rounded-full'>
-                        <label className='w-1/4'>Seu nome</label>
-                        <input
-                          type='text'
-                          name='nome'
-                          id='nome'
-                          value={form.values.nome}
-                          onChange={form.handleChange}
-                          className='w-3/4 p-4 outline-none appearance-none focus:outline-none active:outline-none bg-gray-100 border rounded-full'
-                        />
-                      </div>
-                      <div className='my-1 flex items-center w-full h-13 pl-3 bg-white bg-gray-100 border rounded-full'>
-                        <label className='w-1/4'>Seu CPF</label>
-                        <input
-                          type='text'
-                          name='cpf'
-                          id='cpf'
-                          value={form.values.cpf}
-                          onChange={form.handleChange}
-                          className='w-3/4 p-4 outline-none appearance-none focus:outline-none active:outline-none bg-gray-100 border rounded-full'
-                        />
-                      </div>
-                      <div className='my-1 flex items-center w-full h-13 pl-3 bg-white bg-gray-100 border rounded-full'>
-                        <label className='w-1/4'>Seu telefone</label>
-                        <input
-                          type='text'
-                          name='telefone'
-                          id='telefone'
-                          value={form.values.telefone}
-                          onChange={form.handleChange}
-                          className='w-3/4 p-4 outline-none appearance-none focus:outline-none active:outline-none bg-gray-100 border rounded-full'
-                        />
-                      </div>
-                      <button className='flex justify-center w-full px-10 py-3 mt-6 font-medium text-white uppercase bg-gray-800 rounded-full shadow item-center hover:bg-gray-700 focus:shadow-outline focus:outline-none'>
-                        <svg
-                          aria-hidden='true'
-                          data-prefix='far'
-                          data-icon='credit-card'
-                          className='w-8'
-                          xmlns='http://www.w3.org/2000/svg'
-                          viewBox='0 0 576 512'
-                        >
-                          <path
-                            fill='currentColor'
-                            d='M527.9 32H48.1C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48.1 48h479.8c26.6 0 48.1-21.5 48.1-48V80c0-26.5-21.5-48-48.1-48zM54.1 80h467.8c3.3 0 6 2.7 6 6v42H48.1V86c0-3.3 2.7-6 6-6zm467.8 352H54.1c-3.3 0-6-2.7-6-6V256h479.8v170c0 3.3-2.7 6-6 6zM192 332v40c0 6.6-5.4 12-12 12h-72c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h72c6.6 0 12 5.4 12 12zm192 0v40c0 6.6-5.4 12-12 12H236c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h136c6.6 0 12 5.4 12 12z'
+                    {orderStatus === 'pre-order' && (
+                      <form onSubmit={form.handleSubmit}>
+                        <p className='mb-4 italic'>
+                          Por favor, informe seus dados abaixo para concluir.
+                        </p>
+                        <div className='my-1 flex items-center w-full h-13 pl-3 bg-white bg-gray-100 border rounded-full'>
+                          <label className='w-1/4'>Seu nome</label>
+                          <input
+                            type='text'
+                            name='nome'
+                            id='nome'
+                            value={form.values.nome}
+                            onChange={form.handleChange}
+                            className='w-3/4 p-4 outline-none appearance-none focus:outline-none active:outline-none bg-gray-100 border rounded-full'
                           />
-                        </svg>
-                        <span className='ml-2 mt-5px'>Concluir pedido</span>
-                      </button>
-                    </form>
+                        </div>
+                        <div className='my-1 flex items-center w-full h-13 pl-3 bg-white bg-gray-100 border rounded-full'>
+                          <label className='w-1/4'>Seu CPF</label>
+                          <input
+                            type='text'
+                            name='cpf'
+                            id='cpf'
+                            value={form.values.cpf}
+                            onChange={form.handleChange}
+                            className='w-3/4 p-4 outline-none appearance-none focus:outline-none active:outline-none bg-gray-100 border rounded-full'
+                          />
+                        </div>
+                        <div className='my-1 flex items-center w-full h-13 pl-3 bg-white bg-gray-100 border rounded-full'>
+                          <label className='w-1/4'>Seu telefone</label>
+                          <input
+                            type='text'
+                            name='telefone'
+                            id='telefone'
+                            value={form.values.telefone}
+                            onChange={form.handleChange}
+                            className='w-3/4 p-4 outline-none appearance-none focus:outline-none active:outline-none bg-gray-100 border rounded-full'
+                          />
+                        </div>
+                        <button className='flex justify-center w-full px-10 py-3 mt-6 font-medium text-white uppercase bg-gray-800 rounded-full shadow item-center hover:bg-gray-700 focus:shadow-outline focus:outline-none'>
+                          <svg
+                            aria-hidden='true'
+                            data-prefix='far'
+                            data-icon='credit-card'
+                            className='w-8'
+                            xmlns='http://www.w3.org/2000/svg'
+                            viewBox='0 0 576 512'
+                          >
+                            <path
+                              fill='currentColor'
+                              d='M527.9 32H48.1C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48.1 48h479.8c26.6 0 48.1-21.5 48.1-48V80c0-26.5-21.5-48-48.1-48zM54.1 80h467.8c3.3 0 6 2.7 6 6v42H48.1V86c0-3.3 2.7-6 6-6zm467.8 352H54.1c-3.3 0-6-2.7-6-6V256h479.8v170c0 3.3-2.7 6-6 6zM192 332v40c0 6.6-5.4 12-12 12h-72c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h72c6.6 0 12 5.4 12 12zm192 0v40c0 6.6-5.4 12-12 12H236c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h136c6.6 0 12 5.4 12 12z'
+                            />
+                          </svg>
+                          <span className='ml-2 mt-5px'>Concluir pedido</span>
+                        </button>
+                      </form>
+                    )}
+                    {orderStatus === 'ordering' && (
+                      <p>Pedido sendo realizado. Aguarde...</p>
+                    )}
+                    {orderStatus === 'order-received' && (
+                      <>
+                        <p>Efetue o pagamento com o QRCode abaixo:</p>
+                        <img src={qrcode} />
+                      </>
+                    )}
                   </div>
                 </div>
               </div>

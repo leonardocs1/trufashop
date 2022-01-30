@@ -1,9 +1,7 @@
-require('dotenv').config({ path: '../.env.homologacao' })
-
-const { v4 } = require('uuid')
+require('dotenv').config({ path: '../.env.producao' })
 
 const { GoogleSpreadsheet } = require('google-spreadsheet')
-const credenciais = require('../credenciais.json')
+const credenciais = require('../../credenciais.json')
 
 const doc = new GoogleSpreadsheet(
   '1beFlGzcCtXBKgq0gePQFknqSsp9MDkf-z2mbum6XKMU'
@@ -16,7 +14,7 @@ const saveOrder = async (order) => {
   })
   await doc.loadInfo()
   const sheet = doc.sheetsByIndex[1]
-  const orderId = v4()
+  const orderId = order.id
   const total = order.items.reduce((prev, curr) => {
     return prev + curr.price * curr.quantity
   }, 0)
@@ -35,7 +33,6 @@ const saveOrder = async (order) => {
     }
     return row
   })
-  console.log(rows)
   await sheet.addRows(rows)
 }
 module.exports = {

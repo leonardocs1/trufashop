@@ -1,6 +1,7 @@
 const express = require('express')
 const cors = require('cors')
-const { saveOrder } = require('./spreadsheet')
+const { saveOrder } = require('./lib/spreadsheet')
+const { createPixCharge } = require('./lib/pix')
 
 const app = express()
 
@@ -11,10 +12,17 @@ app.get('/', (req, res) => {
   res.send({ ok: true })
 })
 app.post('/create-order', async (req, res) => {
-  await saveOrder(req.body)
-  res.send({ ok: 1 })
+  const pixCharge = await createPixCharge(req.body)
+  const { qrcode, cobranca } = pixCharge
+  await saveOrder({ ...req.body, id: cobranca.txid })
+  res.send({ ok: 1, qrcode, cobranca })
 })
 
-app.listen(3001, () => {
-  console.log('is running')
+app.listen(3001, (err) => {
+  if (err) {
+    console.log('Servidor não iniciado.')
+    console.log(err)
+  } else {
+    console.log('Servidor do TrufaShop rodando na porta: 3001')
+  }
 })
