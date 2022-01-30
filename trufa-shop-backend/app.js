@@ -17,7 +17,7 @@ app.post('/create-order', async (req, res) => {
   await saveOrder({ ...req.body, id: cobranca.txid })
   res.send({ ok: 1, qrcode, cobranca })
 })
-app.post('/webhook/pix', (req, res) => {
+app.post('/webhook/pix*', (req, res) => {
   console.log('webhook received')
   console.log(req.body)
   if (!req.client.authorized) {

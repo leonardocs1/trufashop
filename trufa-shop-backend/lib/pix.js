@@ -97,7 +97,7 @@ const createPixCharge = async () => {
       nome: 'Leonardo Costa Santos',
     },
     valor: {
-      original: '0.10',
+      original: '0.11',
     },
     chave,
     solicitacaoPagador: 'Cobranca dos serviços prestados',
