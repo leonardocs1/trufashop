@@ -49,8 +49,6 @@ const Index = ({ products }) => {
     return Number(
       prev + cart.cart[curr].quantity * cart.cart[curr].product.data.price
     )
-      .toFixed(2)
-      .replace('.', ',')
   }, 0)
   return (
     <>
@@ -230,7 +228,7 @@ const Index = ({ products }) => {
                       Total
                     </div>
                     <div className='lg:px-4 lg:py-2 m-2 lg:text-lg font-bold text-center text-gray-900'>
-                      R$ {total}
+                      R$ {Number(total).toFixed(2).replace('.', ',')}
                     </div>
                   </div>
                 </div>
