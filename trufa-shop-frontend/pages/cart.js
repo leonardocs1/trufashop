@@ -6,6 +6,22 @@ import { useFormik } from 'formik'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
+import * as yup from 'yup'
+
+const schema = yup.object().shape({
+  nome: yup.string().required('Por favor, informe seu nome.'),
+  cpf: yup
+    .string()
+    .required('Por favor, informe um CPF.')
+    .matches('/[0-9]{11,11}/', 'Informe um CPF no formato: 99999999'),
+  telefone: yup
+    .string()
+    .required('Por favor, informe seu telefone.')
+    .matches(
+      /\([1-9]{2,2}\) [0-9]{5,5}-[0-9]{4,4}/,
+      'Por favor, insira um telefone no formato: (99) 99999-9999'
+    ),
+})
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json())
 
@@ -30,6 +46,7 @@ const Index = ({ products }) => {
       nome: '',
       telefone: '',
     },
+    validationSchema: schema,
     onSubmit: async (values) => {
       const order = { ...values }
       const items = Object.keys(cart.cart).map((curr) => {
@@ -177,6 +194,11 @@ const Index = ({ products }) => {
                               className='w-3/4 p-4 outline-none appearance-none focus:outline-none active:outline-none bg-gray-100 border rounded-full'
                             />
                           </div>
+                          {form.errors && form.errors.nome && (
+                            <p className='block text-red-600 p-2 m-2'>
+                              {form.errors.nome}
+                            </p>
+                          )}
                           <div className='my-1 flex items-center w-full h-13 pl-3 bg-white bg-gray-100 border rounded-full'>
                             <label className='w-1/4'>Seu CPF</label>
                             <input
@@ -188,6 +210,11 @@ const Index = ({ products }) => {
                               className='w-3/4 p-4 outline-none appearance-none focus:outline-none active:outline-none bg-gray-100 border rounded-full'
                             />
                           </div>
+                          {form.errors && form.errors.nome && (
+                            <p className='block text-red-600 p-2 m-2'>
+                              {form.errors.cpf}
+                            </p>
+                          )}
                           <div className='my-1 flex items-center w-full h-13 pl-3 bg-white bg-gray-100 border rounded-full'>
                             <label className='w-1/4'>Seu telefone</label>
                             <input
@@ -199,6 +226,11 @@ const Index = ({ products }) => {
                               className='w-3/4 p-4 outline-none appearance-none focus:outline-none active:outline-none bg-gray-100 border rounded-full'
                             />
                           </div>
+                          {form.errors && form.errors.nome && (
+                            <p className='block text-red-600 p-2 m-2'>
+                              {form.errors.telefone}
+                            </p>
+                          )}
                           <button className='flex justify-center w-full px-10 py-3 mt-6 font-medium text-white uppercase bg-gray-800 rounded-full shadow item-center hover:bg-gray-700 focus:shadow-outline focus:outline-none'>
                             <svg
                               aria-hidden='true'
