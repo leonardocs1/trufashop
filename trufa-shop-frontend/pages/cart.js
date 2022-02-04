@@ -2,7 +2,7 @@ import Head from 'next/head'
 import Prismic from 'prismic-javascript'
 import { useCart } from '../components/CartContex'
 import Header from '../components/Header'
-import { useFormik } from 'formik'
+import { Formik, useFormik } from 'formik'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
@@ -46,7 +46,6 @@ const Index = ({ products }) => {
       nome: '',
       telefone: '',
     },
-    validationSchema: schema,
     onSubmit: async (values) => {
       const order = { ...values }
       const items = Object.keys(cart.cart).map((curr) => {
@@ -67,6 +66,7 @@ const Index = ({ products }) => {
       setTxid(result.data.cobranca.txid)
       setOrderStatus('order-received')
     },
+    // validationSchema: { schema },
   })
   const remove = (id) => () => {
     cart.removeFromCart(id)
